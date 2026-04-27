@@ -16,6 +16,7 @@
   },
   "scripts": {
     "pack": "powershell -ExecutionPolicy Bypass -File ./tools/pack.ps1",
+    "pack:release": "powershell -ExecutionPolicy Bypass -File ./tools/build-release.ps1",
     "deploy": "powershell -ExecutionPolicy Bypass -File ./tools/deploy.ps1"
   }
 }

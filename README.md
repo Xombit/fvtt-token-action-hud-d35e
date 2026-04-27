@@ -19,6 +19,14 @@ Install from Foundry's module browser when the package is listed, or install man
 
 `https://github.com/Xombit/fvtt-token-action-hud-d35e/releases/latest/download/module.json`
 
+## Release Validation
+
+The repository includes a release pipeline that can be run manually before publishing a GitHub Release. For local validation, build the release-style artifact with:
+
+`npm run pack:release`
+
+The GitHub Actions release workflow can also be triggered manually to produce the staged `module.json` and `module.zip` artifacts before publishing an actual release.
+
 ## Current Coverage
 
 - Registers as a Token Action HUD Core system module for D35E

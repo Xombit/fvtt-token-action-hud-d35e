@@ -3,6 +3,16 @@ name: Release
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to package, for example v0.1.0
+        required: true
+      upload_to_release:
+        description: Upload built assets to an existing GitHub Release for the provided tag
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -15,82 +25,49 @@ jobs:
   build-release:
     runs-on: ubuntu-latest
 
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.tag }}
+      SHOULD_UPLOAD_TO_RELEASE: ${{ github.event_name == 'release' || inputs.upload_to_release }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Derive release metadata
-        shell: bash
+      - name: Build release assets
+        shell: pwsh
         run: |
-          set -euo pipefail
-          TAG="${{ github.event.release.tag_name }}"
-          VERSION="${TAG#v}"
-          REPO_URL="https://github.com/${{ github.repository }}"
-          MANIFEST_URL="${REPO_URL}/releases/latest/download/module.json"
-          DOWNLOAD_URL="${REPO_URL}/releases/download/${TAG}/module.zip"
-          {
-            echo "TAG=${TAG}"
-            echo "VERSION=${VERSION}"
-            echo "REPO_URL=${REPO_URL}"
-            echo "MANIFEST_URL=${MANIFEST_URL}"
-            echo "DOWNLOAD_URL=${DOWNLOAD_URL}"
-          } >> "$GITHUB_ENV"
+          ./tools/build-release.ps1 -Tag "${env:RELEASE_TAG}" -Repository "${{ github.repository }}" -OutputZipPath "${PWD}/module.zip"
 
-      - name: Stage release files
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p dist-release
-          cp module.json dist-release/module.json
-
-          jq \
-            --arg version "$VERSION" \
-            --arg url "$REPO_URL" \
-            --arg manifest "$MANIFEST_URL" \
-            --arg download "$DOWNLOAD_URL" \
-            '.version = $version | .url = $url | .manifest = $manifest | .download = $download' \
-            dist-release/module.json > dist-release/module.json.tmp
-          mv dist-release/module.json.tmp dist-release/module.json
-
-          jq -e '.id and .version and .manifest and .download' dist-release/module.json > /dev/null
-
-          cp README.md dist-release/README.md
-          cp -R scripts dist-release/scripts
-          cp -R languages dist-release/languages
-
-          if [ -f LICENSE ]; then
-            cp LICENSE dist-release/LICENSE
-          fi
-
-          if [ -f CHANGELOG.md ]; then
-            cp CHANGELOG.md dist-release/CHANGELOG.md
-          fi
-
-      - name: Create module archive
-        shell: bash
-        run: |
-          set -euo pipefail
-          cd dist-release
-          zip -r ../module.zip ./*
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-assets-${{ env.RELEASE_TAG }}
+          path: |
+            dist-release/module.json
+            module.zip
+          if-no-files-found: error
 
       - name: Upload release assets
+        if: env.SHOULD_UPLOAD_TO_RELEASE == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-        shell: bash
+        shell: pwsh
         run: |
-          set -euo pipefail
-          gh release upload "$TAG" dist-release/module.json module.zip --clobber
+          gh release upload "${env:RELEASE_TAG}" dist-release/module.json module.zip --clobber
 
       - name: Publish workflow summary
-        shell: bash
+        shell: pwsh
         run: |
-          {
-            echo "## Release Assets"
-            echo
-            echo "- Version: $VERSION"
-            echo "- Manifest: $MANIFEST_URL"
-            echo "- Download: $DOWNLOAD_URL"
-            echo
-            echo "### Packaged Paths"
-            (cd dist-release && find . -maxdepth 2 | sort)
-          } >> "$GITHUB_STEP_SUMMARY"
+          $manifest = Get-Content "./dist-release/module.json" -Raw | ConvertFrom-Json
+          $paths = Get-ChildItem "./dist-release" -Recurse | ForEach-Object { $_.FullName.Replace((Resolve-Path .).Path + [System.IO.Path]::DirectorySeparatorChar, "") }
+          @(
+            "## Release Assets"
+            ""
+            "- Tag: ${env:RELEASE_TAG}"
+            "- Version: $($manifest.version)"
+            "- Manifest: $($manifest.manifest)"
+            "- Download: $($manifest.download)"
+            "- Uploaded to release: ${env:SHOULD_UPLOAD_TO_RELEASE}"
+            ""
+            "### Packaged Paths"
+          ) + $paths | Set-Content $env:GITHUB_STEP_SUMMARY
