@@ -4,7 +4,7 @@ Token Action HUD D35E is a Token Action HUD Core companion module for the curren
 
 ## Status
 
-The module is currently in an early public release phase. The goal is to provide a stable Token Action HUD Core integration for D35E without duplicating D35E rules logic inside the HUD layer.
+The module is currently in an early public release phase. The goal is to provide a stable Token Action HUD Core integration for D35E.
 
 ## Requirements
 
@@ -18,14 +18,6 @@ The module is currently in an early public release phase. The goal is to provide
 Install from Foundry's module browser when the package is listed, or install manually using the manifest URL:
 
 `https://github.com/Xombit/fvtt-token-action-hud-d35e/releases/latest/download/module.json`
-
-## Release Validation
-
-The repository includes a release pipeline that can be run manually before publishing a GitHub Release. For local validation, build the release-style artifact with:
-
-`npm run pack:release`
-
-The GitHub Actions release workflow can also be triggered manually to produce the staged `module.json` and `module.zip` artifacts before publishing an actual release.
 
 ## Current Coverage
 
@@ -43,8 +35,7 @@ The discovery notes used to shape the initial taxonomy are kept in `docs/discove
 
 ## Known Limits
 
-- This is an early release and action coverage is still expanding
-- Full public packaging and release automation are present, but the first public package may still surface rough edges in less common D35E workflows
+- This is an early release and action coverage may still expand
 
 ## Support
 
