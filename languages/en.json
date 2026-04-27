@@ -1,0 +1,52 @@
+{
+  "tokenActionHud": {
+    "consumables": "Consumables",
+    "d35e": {
+      "attributes": "Attributes",
+      "attacks": "Attacks",
+      "bab": "Base Attack Bonus",
+      "buffs": "Buffs",
+      "casterLevel": "Caster Level",
+      "checks": "Checks",
+      "combat": "Combat",
+      "conditions": "Conditions",
+      "concentration": "Concentration",
+      "equipment": "Equipment",
+      "feats": "Feats",
+      "fullAttacks": "Full Attacks",
+      "gear": "Gear",
+      "grapple": "Grapple",
+      "groupPowersSeparately": "Group Powers Separately",
+      "groupPowersSeparatelyHint": "Show psionic powers in their own HUD group instead of mixing them into spells.",
+      "inventory": "Inventory",
+      "melee": "Melee",
+      "powers": "Powers",
+      "ranged": "Ranged",
+      "rollInitiative": "Roll Initiative",
+      "settings": {
+        "abbreviateSkills": {
+          "hint": "Display skill and ability names as abbreviations where possible.",
+          "name": "Abbreviate Skill and Ability Names"
+        },
+        "groupPowersSeparately": {
+          "hint": "Show powers in a dedicated powers group instead of the spells group.",
+          "name": "Group Powers Separately"
+        },
+        "showUnequippedItems": {
+          "hint": "Show unequipped inventory items for actors that are not NPCs.",
+          "name": "Show Unequipped Items"
+        }
+      },
+      "spellbookUtility": "Spellbook Utility",
+      "spells": "Spells",
+      "utility": "Utility"
+    },
+    "effects": "Effects",
+    "magic": "Magic",
+    "saves": "Saves",
+    "skills": "Skills",
+    "tools": "Tools",
+    "utility": "Utility",
+    "weapons": "Weapons"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "fvtt-token-action-hud-d35e",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Token Action HUD Core companion module for the D35E system",
+  "author": "Xombit",
+  "license": "MIT",
+  "homepage": "https://github.com/Xombit/fvtt-token-action-hud-d35e",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Xombit/fvtt-token-action-hud-d35e.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Xombit/fvtt-token-action-hud-d35e/issues"
+  },
+  "scripts": {
+    "pack": "powershell -ExecutionPolicy Bypass -File ./tools/pack.ps1",
+    "deploy": "powershell -ExecutionPolicy Bypass -File ./tools/deploy.ps1"
+  }
+}
