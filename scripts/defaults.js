@@ -54,13 +54,20 @@ Hooks.once("tokenActionHudCoreApiReady", async coreModule => {
         ]
       },
       {
+        nestId: "feats",
+        id: "feats",
+        name: coreModule.api.Utils.i18n("tokenActionHud.d35e.feats"),
+        groups: [
+          { ...groups.feats, nestId: "feats_feats" }
+        ]
+      },
+      {
         nestId: "effects",
         id: "effects",
         name: coreModule.api.Utils.i18n("tokenActionHud.effects"),
         groups: [
           { ...groups.buffs, nestId: "effects_buffs" },
-          { ...groups.conditions, nestId: "effects_conditions" },
-          { ...groups.feats, nestId: "effects_feats" }
+          { ...groups.conditions, nestId: "effects_conditions" }
         ]
       },
       {

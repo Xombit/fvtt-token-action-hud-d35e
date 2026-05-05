@@ -211,6 +211,7 @@ Hooks.once("tokenActionHudCoreApiReady", async coreModule => {
 
         const actions = spellItems
           .filter(item => item.system?.spellbook === spellbookKey)
+          .filter(item => this.#hasRemainingUses(item))
           .sort((left, right) => {
             const leftLevel = left.system?.level ?? 0;
             const rightLevel = right.system?.level ?? 0;
@@ -240,7 +241,7 @@ Hooks.once("tokenActionHudCoreApiReady", async coreModule => {
       this.addActions(actions, { id: GROUP.utility.id });
     }
 
-    #createAction({ id, name, actionType, actionId, cssClass = "", img = "", info1 = null, info2 = null }) {
+    #createAction({ id, name, actionType, actionId, cssClass = "", img = "", info1 = null, info2 = null, tooltip = null }) {
       return {
         id,
         name,
@@ -248,6 +249,7 @@ Hooks.once("tokenActionHudCoreApiReady", async coreModule => {
         cssClass,
         info1,
         info2,
+        tooltip,
         listName: name,
         hasContextMenu: true,
         system: {
@@ -262,14 +264,44 @@ Hooks.once("tokenActionHudCoreApiReady", async coreModule => {
       const info1 = extra.info1 ?? (quantity > 1 ? { text: `${quantity}` } : null);
       return this.#createAction({
         id: `${actionType}-${item.id}`,
-        name: item.name,
+        name: this.#getItemDisplayName(item),
         img: Utils.getImage(item),
         actionType,
         actionId: item.id,
         cssClass: extra.cssClass ?? "",
         info1,
-        info2: extra.info2 ?? null
+        info2: extra.info2 ?? null,
+        tooltip: "tooltip" in extra ? extra.tooltip : this.#getItemTooltip(item)
       });
+    }
+
+    #getItemDisplayName(item) {
+      if (item.system?.identified === false) {
+        return item.system?.unidentified?.name || item.name;
+      }
+      return item.name;
+    }
+
+    #getItemTooltip(item) {
+      const isUnidentified = item.system?.identified === false;
+      const content = isUnidentified
+        ? item.system?.description?.unidentified
+        : item.system?.description?.value;
+      return content ? { content } : null;
+    }
+
+    #hasRemainingUses(item) {
+      if (item.system?.atWill === true) return true;
+      if (item.system?.isPower) return true;
+      const spellbookKey = item.system?.spellbook;
+      if (!spellbookKey) return true;
+      const spellbook = this.actor.system?.attributes?.spells?.spellbooks?.[spellbookKey];
+      if (!spellbook) return true;
+      if (spellbook.spontaneous) {
+        const level = item.system?.level ?? 0;
+        return (spellbook.spells?.[`spell${level}`]?.value ?? 0) > 0;
+      }
+      return (item.system?.preparation?.preparedAmount ?? 0) > 0;
     }
 
     #getSkillEntries() {
