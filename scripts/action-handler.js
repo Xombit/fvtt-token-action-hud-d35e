@@ -297,6 +297,11 @@ Hooks.once("tokenActionHudCoreApiReady", async coreModule => {
       if (!spellbookKey) return true;
       const spellbook = this.actor.system?.attributes?.spells?.spellbooks?.[spellbookKey];
       if (!spellbook) return true;
+      if (spellbook.usePowerPoints) {
+        const available = spellbook.powerPoints ?? 0;
+        const cost = item.system?.powerPointsCost ?? 0;
+        return available >= cost;
+      }
       if (spellbook.spontaneous) {
         const level = item.system?.level ?? 0;
         return (spellbook.spells?.[`spell${level}`]?.value ?? 0) > 0;
